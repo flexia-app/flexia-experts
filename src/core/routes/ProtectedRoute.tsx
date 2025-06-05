@@ -1,9 +1,10 @@
-import type { JSX } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 import { Navigate, Outlet } from "react-router-dom";
-// import { getDecryptedItem } from "@/core/utils/storageUtils";
+import type { JSX } from "react";
 
 const ProtectedRoute = (): JSX.Element => {
-  const token = "TODO"; // TODO: getDecryptedItem<string>("token");
+  const token = useSelector((state: RootState) => state.auth.token);
 
   return token ? <Outlet /> : <Navigate to="/login" replace />;
 };

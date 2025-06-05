@@ -7,14 +7,20 @@ import {ExercisesTableFiltersDrawer} from "@/exercises/components/ExercisesTable
 import {useState} from "react";
 import {CreateEditExerciseDrawer} from "@/exercises/components/CreateEditExerciseDrawer.tsx";
 import {toast} from "sonner";
+import { useDispatch } from 'react-redux';
+import { logout } from '@/store/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 export const ExercisesPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [openFilters, setOpenFilters] = useState(false);
   const [openFormDrawer, setOpenFormDrawer] = useState(false);
   const [selectedExerciseId, setSelectedExerciseId] = useState<string>();
 
-  function logout() {
-    // TODO
+  function handleLogout() {
+    dispatch(logout());
+    navigate('/login');
     toast.warning("Has cerrado sesión");
   }
 
@@ -26,7 +32,7 @@ export const ExercisesPage = () => {
             <FlexiaIcon className="size-8" />
             <h1 className="text-sm font-medium">Bienvenid@ a Flexia Experts</h1>
           </div>
-          <Button size="icon" className="rounded-full" onClick={logout}>
+          <Button size="icon" className="rounded-full" onClick={handleLogout}>
             <BiLogOut />
           </Button>
         </div>
