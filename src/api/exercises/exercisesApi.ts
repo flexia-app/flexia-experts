@@ -42,3 +42,13 @@ export const filterExercisesByProps = async (
   const response = await api.get(`/exercises/search/filters/?${params.toString()}`);
   return response.data;
 };
+
+
+export const createExercise = async (exercise: FormData) => {
+  const response = await api.post(`/exercises`, exercise, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+}

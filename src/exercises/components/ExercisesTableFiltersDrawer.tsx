@@ -5,7 +5,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import {IoMdClose} from "react-icons/io";
-import {DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.tsx";
+import {DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.ts";
 import {FSelect} from "@/components/FSelect.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useDispatch, useSelector} from "react-redux";

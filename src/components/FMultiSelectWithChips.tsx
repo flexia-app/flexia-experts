@@ -8,6 +8,7 @@ import {
 import {type Control, useController} from "react-hook-form";
 import { FClosableChip } from "@/components/FClosableChip";
 import { useState } from "react";
+import {mapLabel} from "@/exercises/utils/mapLabel.ts";
 
 interface FMultiSelectWithChipsProps {
   name: string;
@@ -31,6 +32,7 @@ export const FMultiSelectWithChips = (
   });
 
   const [tempValue, setTempValue] = useState<string>("");
+  const getLabel = mapLabel(options);
 
   const addItem = (val: string) => {
     if (!value.includes(val)) {
@@ -63,7 +65,7 @@ export const FMultiSelectWithChips = (
 
       <div className="flex flex-wrap gap-1 mt-2">
         {value.map((v: string, i: number) => (
-          <FClosableChip key={i} label={v} onClose={() => removeItem(v)} />
+          <FClosableChip key={i} label={getLabel(v)} onClose={() => removeItem(v)} />
         ))}
       </div>
     </div>

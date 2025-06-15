@@ -10,6 +10,7 @@ export const Equipments  = {
   EZCurlBar: 'EZ Curl Bar',
   FoamRoll: 'Foam Roll',
   ExerciseBall: 'Exercise Ball',
+  JumpingRope: 'Jumping Rope',
   Bands: 'Bands',
   Barbell: 'Barbell',
   BodyWeight: 'Body Weight',

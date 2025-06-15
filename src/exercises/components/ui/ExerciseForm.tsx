@@ -1,51 +1,53 @@
 import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {FSelect} from "@/components/FSelect.tsx";
-import {AVAILABILITIES, DIFFICULTIES, MUSCLES, EQUIPMENTS} from "@/exercises/utils/filters.tsx";
-import {useForm} from "react-hook-form";
+import {
+  AVAILABILITIES,
+  DIFFICULTIES,
+  MUSCLES,
+  EQUIPMENTS,
+  EXERCISE_TYPES,
+  LOG_TYPES
+} from "@/exercises/utils/filters.ts";
 import {FMultiSelectWithChips} from "@/components/FMultiSelectWithChips.tsx";
 import {useState} from "react";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Label} from "@/components/ui/label";
+import {type Control, Controller, type UseFormRegister, type UseFormSetValue} from "react-hook-form";
+import type {LogType} from "@/exercises/types/log-type.ts";
+import type {Difficulty} from "@/exercises/types/difficulty.ts";
+import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
+import type {Equipment} from "@/exercises/types/equipment.ts";
+import type {ExerciseType} from "@/exercises/types/exercise-type.ts";
 
 export type ExerciseFormData = {
   id?: string;
   title: string;
-  instructions: string;
-  difficulty?: string;
-  muscles: string[];
-  equipments: string[];
-  image: string;
-  active?: boolean;
+  description: string;
+  exerciseType: ExerciseType;
+  logType: LogType;
+  difficulty: Difficulty;
+  muscles: MuscleGroup[];
+  equipments: Equipment[];
+  image: File;
+  active: boolean;
 }
 
 interface ExerciseFormProps {
-  defaultValues: ExerciseFormData;
   selectedExerciseId?: string;
+  register: UseFormRegister<ExerciseFormData>;
+  control: Control<ExerciseFormData>;
+  setValue: UseFormSetValue<ExerciseFormData>;
 }
 
 export const ExerciseForm = (
   {
-    defaultValues,
-    selectedExerciseId
+    selectedExerciseId,
+    register,
+    control,
+    setValue,
   }: ExerciseFormProps
 ) => {
-
-  const {
-    register,
-    setValue,
-    control
-  } = useForm<ExerciseFormData>({
-    defaultValues: defaultValues || {
-      id: selectedExerciseId,
-      title: "",
-      instructions: "",
-      difficulty: "",
-      muscles: [],
-      equipments: [],
-      image: "",
-      active: true,
-    },
-  });
-
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   return (
@@ -66,13 +68,56 @@ export const ExerciseForm = (
       <Textarea
         label="Instrucciones"
         placeholder="Describe el ejercicio"
-        {...register("instructions", { required: true })}
+        {...register("description", { required: true })}
       />
-      <FSelect
-        label="Dificultad"
-        options={DIFFICULTIES}
-        placeholder="Selecciona la dificultad"
-        {...register("difficulty", { required: true })}
+      <Controller
+        name="difficulty"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <div className="space-y-2">
+            <h1 className="mb-1 font-medium text-xs">Dificultad</h1>
+            <RadioGroup
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              {DIFFICULTIES.map((difficulty) => (
+                <div key={difficulty.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={difficulty.value} id={`difficulty-${difficulty.value}`} />
+                  <Label htmlFor={`difficulty-${difficulty.value}`}>{difficulty.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+      />
+      <Controller
+        name="exerciseType"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <FSelect
+            label="Tipo de ejercicio"
+            options={EXERCISE_TYPES}
+            value={field.value}
+            onValueChange={field.onChange}
+            emptyLabel="Selecciona"
+          />
+        )}
+      />
+      <Controller
+        name="logType"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <FSelect
+            label="Tipo de registro"
+            options={LOG_TYPES}
+            value={field.value}
+            onValueChange={field.onChange}
+            emptyLabel="Selecciona"
+          />
+        )}
       />
       <FMultiSelectWithChips
         name="muscles"
@@ -96,9 +141,9 @@ export const ExerciseForm = (
             if (file) {
               const reader = new FileReader();
               reader.onloadend = () => {
-                setValue("image", reader.result as string); // base64
+                // setValue("image", reader.result as string); // base64
                 // setValue("image", URL.createObjectURL(file)); // blob
-                // setValue("image", file); // file
+                setValue("image", file); // file
 
                 const imageUrl = URL.createObjectURL(file);
                 setPreviewImage(imageUrl);
@@ -106,7 +151,6 @@ export const ExerciseForm = (
               reader.readAsDataURL(file);
             }
             else {
-              setValue("image", "");
               setPreviewImage(null);
             }
           }}

@@ -18,7 +18,7 @@ export interface Exercise {
 }
 
 export interface CreateExercise {
-  file: string;
+  file: File;
   name: string;
   description: string;
   exerciseType: ExerciseType;

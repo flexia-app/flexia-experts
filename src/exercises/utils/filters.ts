@@ -1,6 +1,8 @@
 import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
 import type {Equipment} from "@/exercises/types/equipment.ts";
 import type {Difficulty} from "@/exercises/types/difficulty.ts";
+import type {ExerciseType} from "@/exercises/types/exercise-type.ts";
+import type {LogType} from "@/exercises/types/log-type.ts";
 
 export const MUSCLES: { value: MuscleGroup; label: string }[] = [
   { value: 'Abs', label: 'Abdominales' },
@@ -36,10 +38,30 @@ export const EQUIPMENTS: { value: Equipment; label: string }[] = [
   { value: "Foam Roll", label: "Rulo de Espuma" },
   { value: "Exercise Ball", label: "Pelota de Ejercicio" },
   { value: "Bands", label: "Bandas" },
+  { value: "Jumping Rope", label: "Cuerda de salto" },
   { value: "Barbell", label: "Barra" },
   { value: "Body Weight", label: "Peso Corporal" },
   { value: "Other", label: "Otro" },
 ];
+
+export const EXERCISE_TYPES: { value: ExerciseType; label: string }[] = [
+  { value: "Dynamic", label: "Dinámico" },
+  { value: "Explosive", label: "Explosivo" },
+  { value: "Mobility", label: "Movilidad" },
+  { value: "Olympic", label: "Olímpico" },
+  { value: "Power", label: "Fuerza" },
+  { value: "Strength", label: "Fortaleza" },
+  { value: "Stretching", label: "Estiramientos" },
+  { value: "Yoga", label: "Yoga" },
+]
+
+export const LOG_TYPES: { value: LogType; label: string }[] = [
+  { value: "Cardio", label: "Cardio" },
+  { value: "Duration", label: "Duración" },
+  { value: "Reps", label: "Repetición" },
+  { value: "Reps And Duration", label: "Repeticiones y duración" },
+  { value: "Weight And Reps", label: "Peso y Repeticiones" },
+]
 
 export const AVAILABILITIES = [
   { value: true, label: "Activo" },

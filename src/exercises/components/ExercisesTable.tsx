@@ -5,8 +5,9 @@ import {FiEdit} from "react-icons/fi";
 import { toast } from "sonner"
 import type {Exercise} from "@/exercises/types/exercise.ts";
 import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
-import {DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.tsx";
+import {DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.ts";
 import type {Equipment} from "@/exercises/types/equipment.ts";
+import {mapLabel} from "@/exercises/utils/mapLabel.ts";
 
 interface ExercisesTableProps {
   setSelectedExerciseId: (exerciseId: string) => void;
@@ -33,18 +34,13 @@ export const ExercisesTable = (
     totalExercises,
   }: ExercisesTableProps
 ) => {
-
-  const mapLabel = (list: { value: string; label: string }[]) => {
-    const dict = Object.fromEntries(list.map(i => [i.value, i.label]));
-    return (val: string) => dict[val] || val;
-  };
-
   const getMuscleLabel = mapLabel(MUSCLES);
   const getDifficultyLabel = mapLabel(DIFFICULTIES);
   const getEquipmentLabel = mapLabel(EQUIPMENTS);
 
   const columns: ColumnDef<Exercise>[] = [
     { accessorKey: "id", header: "Id" },
+    { accessorKey: "name", header: "Nombre" },
     {
       accessorKey: "muscleGroups",
       header: "Músculo principal",
