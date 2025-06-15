@@ -4,7 +4,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type ColumnDef, getPaginationRowModel,
+  type ColumnDef,
 } from "@tanstack/react-table"
 
 import {
@@ -19,21 +19,28 @@ import {Button} from "@/components/ui/button.tsx";
 import {IoCaretBack, IoCaretForward} from "react-icons/io5";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  page: number;
+  setPage: (page: number) => void;
+  totalPages: number;
 }
 
 export function DataTable<TData, TValue>(
   {
     columns,
     data,
+    page,
+    setPage,
+    totalPages,
   }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  })
+    manualPagination: true,
+    pageCount: totalPages,
+  });
 
   return (
     <div className="flex flex-col h-[80vh] justify-between">
@@ -73,34 +80,20 @@ export function DataTable<TData, TValue>(
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                No se encontraron resultados
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
       <div className="flex items-center justify-end space-x-4 py-4">
-        <Button
-          size="icon"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
+        <Button size="icon" onClick={() => setPage(page - 1)} disabled={page <= 1}>
           <IoCaretBack />
         </Button>
-        <div className="flex items-center gap-1">
-          <span className="text-sm text-muted-foreground">
-            Página{" "}
-            <strong>
-              {table.getState().pagination.pageIndex + 1} de{" "}
-              {table.getPageCount()}
-            </strong>
-          </span>
-        </div>
-        <Button
-          size="icon"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
+        <span className="text-sm text-muted-foreground">
+          Página <strong>{page} de {totalPages}</strong>
+        </span>
+        <Button size="icon" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
           <IoCaretForward />
         </Button>
       </div>

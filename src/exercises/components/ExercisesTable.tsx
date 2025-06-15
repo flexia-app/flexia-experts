@@ -3,53 +3,43 @@ import {DataTable} from "@/components/ui/data-table.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {FiEdit} from "react-icons/fi";
 import { toast } from "sonner"
+import type {Exercise} from "@/types/exercise";
+import {MuscleGroup} from "@/types/muscle-group";
 
-type ExerciseTableItem = {
-  id: string;
-  title: string;
-  mainMuscle: string;
-  difficulty: string;
-  active: boolean;
+interface ExercisesTableProps {
+  setSelectedExerciseId: (exerciseId: string) => void;
+  setOpenFormDrawer: (open: boolean) => void;
+  exercises: Exercise[];
+  isLoading: boolean;
+  isError: boolean;
+  page: number;
+  setPage: (page: number) => void;
+  totalPages: number;
 }
-
-const exercises : ExerciseTableItem[] = [
-  {
-    id: "1",
-    title: "Flexiones",
-    mainMuscle: "Pectorales",
-    difficulty: "Principiante",
-    active: true,
-  },
-  {
-    id: "2",
-    title: "Sentadillas",
-    mainMuscle: "Piernas",
-    difficulty: "Media",
-    active: true,
-  },
-  {
-    id: "3",
-    title: "Dominadas",
-    mainMuscle: "Espalda",
-    difficulty: "Difícil",
-    active: false,
-  }
-]
 
 export const ExercisesTable = (
   {
     setSelectedExerciseId,
-    setOpenFormDrawer
-  }:
-  {
-    setSelectedExerciseId: (exerciseId: string) => void;
-    setOpenFormDrawer: (open: boolean) => void;
-  }
+    setOpenFormDrawer,
+    exercises,
+    isLoading,
+    isError,
+    page,
+    setPage,
+    totalPages,
+  }: ExercisesTableProps
 ) => {
 
-  const columns: ColumnDef<ExerciseTableItem>[] = [
-    { accessorKey: "title", header: "Título" },
-    { accessorKey: "mainMuscle", header: "Músculo principal" },
+  const columns: ColumnDef<Exercise>[] = [
+    { accessorKey: "name", header: "Título" },
+    {
+      accessorKey: "muscleGroups",
+      header: "Músculo principal",
+      cell: ({ row }) => {
+        const muscleGroups: MuscleGroup[] = row.getValue("muscleGroups");
+        return muscleGroups[0];
+      },
+    },
     { accessorKey: "difficulty", header: "Dificultad" },
     {
       accessorKey: "active",
@@ -82,10 +72,39 @@ export const ExercisesTable = (
 
   return (
     <div className="flex flex-col gap-2 justify-between h-[80vh]">
-      <DataTable
-        columns={columns}
-        data={exercises}
-      />
+      {isLoading ? (
+        <div className="w-full h-full">
+          <div className="flex flex-col space-y-4 animate-pulse">
+            <div className="grid grid-cols-5 gap-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={`header-${i}`} className="h-8 bg-gray-200 rounded" />
+              ))}
+            </div>
+            {[...Array(5)].map((_, rowIdx) => (
+              <div
+                key={`row-${rowIdx}`}
+                className="grid grid-cols-5 gap-4"
+              >
+                {[...Array(5)].map((_, colIdx) => (
+                  <div key={colIdx} className="h-8 bg-gray-100 rounded" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : isError ? (
+        <div className="flex items-center justify-center w-full h-full">
+          Ocurrió un error cargando los datos.
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={exercises}
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+        />
+      )}
     </div>
   )
 }
