@@ -24,6 +24,7 @@ interface DataTableProps<TData, TValue> {
   page: number;
   setPage: (page: number) => void;
   totalPages: number;
+  totalExercises: number;
 }
 
 export function DataTable<TData, TValue>(
@@ -33,6 +34,7 @@ export function DataTable<TData, TValue>(
     page,
     setPage,
     totalPages,
+    totalExercises,
   }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -43,7 +45,7 @@ export function DataTable<TData, TValue>(
   });
 
   return (
-    <div className="flex flex-col h-[80vh] justify-between">
+    <div className="flex flex-col h-full justify-between">
       <Table>
         <TableHeader className="bg-[#F5F5F5]">
           {table.getHeaderGroups().map((headerGroup) => (
@@ -86,16 +88,19 @@ export function DataTable<TData, TValue>(
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end space-x-4 py-4">
-        <Button size="icon" onClick={() => setPage(page - 1)} disabled={page <= 1}>
-          <IoCaretBack />
-        </Button>
-        <span className="text-sm text-muted-foreground">
+      <div className="flex w-full justify-between items-center">
+        <p className="text-xs text-gray-500">Resultado: {totalExercises} ejercicios encontrados</p>
+        <div className="flex items-center justify-end space-x-4 py-4">
+          <Button size="icon" onClick={() => setPage(page - 1)} disabled={page <= 1}>
+            <IoCaretBack />
+          </Button>
+          <span className="text-sm text-muted-foreground">
           Página <strong>{page} de {totalPages}</strong>
         </span>
-        <Button size="icon" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
-          <IoCaretForward />
-        </Button>
+          <Button size="icon" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
+            <IoCaretForward />
+          </Button>
+        </div>
       </div>
     </div>
   )

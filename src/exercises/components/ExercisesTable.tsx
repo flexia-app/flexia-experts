@@ -3,8 +3,10 @@ import {DataTable} from "@/components/ui/data-table.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {FiEdit} from "react-icons/fi";
 import { toast } from "sonner"
-import type {Exercise} from "@/types/exercise";
-import {MuscleGroup} from "@/types/muscle-group";
+import type {Exercise} from "@/exercises/types/exercise.ts";
+import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
+import {DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.tsx";
+import type {Equipment} from "@/exercises/types/equipment.ts";
 
 interface ExercisesTableProps {
   setSelectedExerciseId: (exerciseId: string) => void;
@@ -15,6 +17,7 @@ interface ExercisesTableProps {
   page: number;
   setPage: (page: number) => void;
   totalPages: number;
+  totalExercises: number;
 }
 
 export const ExercisesTable = (
@@ -27,26 +30,48 @@ export const ExercisesTable = (
     page,
     setPage,
     totalPages,
+    totalExercises,
   }: ExercisesTableProps
 ) => {
 
+  const mapLabel = (list: { value: string; label: string }[]) => {
+    const dict = Object.fromEntries(list.map(i => [i.value, i.label]));
+    return (val: string) => dict[val] || val;
+  };
+
+  const getMuscleLabel = mapLabel(MUSCLES);
+  const getDifficultyLabel = mapLabel(DIFFICULTIES);
+  const getEquipmentLabel = mapLabel(EQUIPMENTS);
+
   const columns: ColumnDef<Exercise>[] = [
-    { accessorKey: "name", header: "Título" },
+    { accessorKey: "id", header: "Id" },
     {
       accessorKey: "muscleGroups",
       header: "Músculo principal",
       cell: ({ row }) => {
         const muscleGroups: MuscleGroup[] = row.getValue("muscleGroups");
-        return muscleGroups[0];
+        return getMuscleLabel(muscleGroups[0]);
       },
     },
-    { accessorKey: "difficulty", header: "Dificultad" },
+    {
+      accessorKey: "equipments",
+      header: "Equipamiento principal",
+      cell: ({ row }) => {
+        const equipments: Equipment[] = row.getValue("equipments");
+        return getEquipmentLabel(equipments[0]);
+      },
+    },
+    {
+      accessorKey: "difficulty",
+      header: "Dificultad",
+      cell: ({ row }) => getDifficultyLabel(row.getValue("difficulty")),
+    },
     {
       accessorKey: "active",
       header: "Visualización",
       cell: ({ row }) => {
         const active = row.getValue("active");
-        return active ? "Activo" : "Inactivo";
+        return active ? "🟢 Activo" : "🟢 Inactivo";
       },
     },
     {
@@ -103,6 +128,7 @@ export const ExercisesTable = (
           page={page}
           setPage={setPage}
           totalPages={totalPages}
+          totalExercises={totalExercises}
         />
       )}
     </div>

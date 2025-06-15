@@ -1,7 +1,7 @@
 import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {FSelect} from "@/components/FSelect.tsx";
-import {AVAILABILITIES, DIFFICULTIES, EQUIPMENTS, MUSCLES} from "@/exercises/utils/filters.ts";
+import {AVAILABILITIES, DIFFICULTIES, MUSCLES, EQUIPMENTS} from "@/exercises/utils/filters.tsx";
 import {useForm} from "react-hook-form";
 import {FMultiSelectWithChips} from "@/components/FMultiSelectWithChips.tsx";
 import {useState} from "react";

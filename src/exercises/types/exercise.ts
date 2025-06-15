@@ -1,8 +1,8 @@
-import { Equipment } from '@/types/equipment';
-import { MuscleGroup } from "@/types/muscle-group";
-import { ExerciseType } from "@/types/exercise-type";
-import { LogType } from "@/types/log-type";
-import { Difficulty } from "@/types/difficulty";
+import type { Difficulty } from "./difficulty";
+import type { Equipment } from "./equipment";
+import type { ExerciseType } from "./exercise-type";
+import type { LogType } from "./log-type";
+import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
 
 export interface Exercise {
   id: string;

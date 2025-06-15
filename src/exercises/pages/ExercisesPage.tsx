@@ -7,12 +7,14 @@ import {ExercisesTableFiltersDrawer} from "@/exercises/components/ExercisesTable
 import {useEffect, useState} from "react";
 import {CreateEditExerciseDrawer} from "@/exercises/components/CreateEditExerciseDrawer.tsx";
 import {toast} from "sonner";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {searchExercisesByName} from "@/api/exercises/exercisesApi.ts";
-import type {SearchExercisesResponse} from "@/types/exercise";
+import {filterExercisesByProps, searchExercisesByName} from "@/api/exercises/exercisesApi.ts";
+import type {SearchExercisesResponse} from "@/exercises/types/exercise.ts";
+import type {RootState} from "@/store";
+import {clearFilters} from "@/store/filtersSlice.ts";
 
 export const ExercisesPage = () => {
   const dispatch = useDispatch();
@@ -26,6 +28,10 @@ export const ExercisesPage = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
+  const muscleGroup = useSelector((state: RootState) => state.filters.muscleGroup);
+  const difficulty = useSelector((state: RootState) => state.filters.difficulty);
+  const equipment = useSelector((state: RootState) => state.filters.equipment);
+
   function handleLogout() {
     dispatch(logout());
     navigate('/login');
@@ -35,18 +41,24 @@ export const ExercisesPage = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1); // Reset to first page on new search
+      dispatch(clearFilters());
+      setPage(1);
     }, 500);
     return () => clearTimeout(handler);
-  }, [search]);
+  }, [dispatch, search]);
 
   const {
     data,
     isLoading,
-    isError
+    isError,
   } = useQuery<SearchExercisesResponse>({
-    queryKey: ['exercises', debouncedSearch, page],
-    queryFn: () => searchExercisesByName(debouncedSearch, limit, page),
+    queryKey: ['exercises', debouncedSearch, muscleGroup, difficulty, equipment, page],
+    queryFn: () => {
+      if (muscleGroup || difficulty || equipment) {
+        return filterExercisesByProps(muscleGroup, difficulty, equipment, limit, page);
+      }
+      return searchExercisesByName(debouncedSearch, limit, page);
+    },
   });
 
   const totalPages = data ? Math.ceil(data.total / limit) : 1;
@@ -95,6 +107,7 @@ export const ExercisesPage = () => {
           page={page}
           setPage={setPage}
           totalPages={totalPages}
+          totalExercises={data?.total || 0}
         />
       </div>
       <ExercisesTableFiltersDrawer
