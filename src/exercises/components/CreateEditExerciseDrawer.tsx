@@ -6,46 +6,67 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import {IoMdClose} from "react-icons/io";
-import {ExerciseForm, type ExerciseFormData} from "@/exercises/components/ui/ExerciseForm.tsx";
 import {toast} from "sonner";
 import {useForm} from "react-hook-form";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {createExercise} from "@/api/exercises/exercisesApi.ts";
+import {createExercise, deleteExercise, updateExercise} from "@/api/exercises/exercisesApi.ts";
+import type {CreateExercise, Exercise} from "@/exercises/types/exercise.ts";
+import {useEffect, useRef, useState} from "react";
+import {
+  buildExerciseObject,
+  buildUpdateObject,
+  type ExerciseFormData,
+  resetFormValues
+} from "@/exercises/utils/exerciseFormUtils.ts";
+import {ExerciseForm} from "@/exercises/components/ExerciseForm.tsx";
 
 export const CreateEditExerciseDrawer = (
   {
     open,
     setOpen,
-    selectedExerciseId
+    selectedExercise
   }: {
     open: boolean,
     setOpen: (open: boolean) => void,
-    selectedExerciseId?: string,
+    selectedExercise?: Exercise,
   }
 ) => {
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const originalValuesRef = useRef<Exercise | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     register,
     setValue,
     control,
-    getValues
+    getValues,
+    reset
   } = useForm<ExerciseFormData>({
     defaultValues: {
-      id: selectedExerciseId,
+      id: "",
       title: "",
       description: "",
       difficulty: "Beginner",
       muscles: [],
       equipments: [],
-      image: undefined,
-      active: true,
+      active: "true",
     },
   });
 
-  const queryClient = useQueryClient();
+  useEffect(() => {
+    resetFormValues(selectedExercise, reset, setPreviewImage, originalValuesRef);
+  }, [selectedExercise, reset, open]);
+
+  useEffect(() => {
+    if (selectedExercise?.mediaUrl) {
+      setPreviewImage(selectedExercise.mediaUrl);
+    } else {
+      setPreviewImage(null);
+    }
+  }, [selectedExercise]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (newExercise: FormData) => createExercise(newExercise),
+    mutationFn: (newExercise: CreateExercise) => createExercise(newExercise),
     onSuccess: () => {
       toast.success("Ejercicio creado con éxito");
       setOpen(false);
@@ -56,40 +77,50 @@ export const CreateEditExerciseDrawer = (
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, formData }: { id: string; formData: Partial<CreateExercise> }) =>
+      updateExercise(id, formData),
+    onSuccess: () => {
+      toast.success("Ejercicio actualizado con éxito.");
+      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
+    },
+    onError: () => {
+      toast.error("Error al actualizar el ejercicio.");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteExercise(id),
+    onSuccess: () => {
+      toast.warning("Ejercicio eliminado con éxito.");
+      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
+    },
+    onError: () => {
+      toast.error("Error al eliminar el ejercicio.");
+    },
+  });
+
   function handleCreateExercise() {
     const values = getValues();
-
-    const formData = new FormData();
-    formData.append("file", values.image);
-    formData.append("name", values.title);
-    formData.append("description", values.description);
-    formData.append("exerciseType", values.exerciseType);
-    formData.append("logType", values.logType);
-    formData.append("difficulty", values.difficulty);
-
-    values.equipments.forEach((eq: string) => {
-      formData.append("equipments", eq);
-    });
-
-    values.muscles.forEach((muscle: string) => {
-      formData.append("muscleGroups", muscle);
-    });
-
+    const formData = buildExerciseObject(values);
     mutate(formData);
   }
 
   function handleEditExercise() {
-    // TODO
-    toast.success("Ejercicio editado con éxito");
-    setOpen(false);
-  }
+    const values = getValues();
+    const original = originalValuesRef.current;
+    if (!original) return;
 
-  function handleDeleteExercise() {
-    // TODO
-    toast.success("Ejercicio eliminado con éxito");
-    setOpen(false);
-  }
+    const updated = buildUpdateObject(values, original);
 
+    if (Object.keys(updated).length > 0) {
+      updateMutation.mutate({ id: original.id, formData: updated });
+    } else {
+      toast.info("No hay cambios para guardar.");
+    }
+  }
   return (
     <Drawer
       open={open}
@@ -100,7 +131,7 @@ export const CreateEditExerciseDrawer = (
         <DrawerHeader>
           <div className="flex w-full justify-between items-center">
             <DrawerTitle className="text-[#64748B] font-bold">
-              {selectedExerciseId ? "Editando ejercicio" : "Crear nuevo ejercicio"}
+              {selectedExercise ? "Editando ejercicio" : "Crear nuevo ejercicio"}
             </DrawerTitle>
             <DrawerDescription></DrawerDescription>
             <button className="hover:cursor-pointer" onClick={()=>setOpen(false)}>
@@ -110,26 +141,28 @@ export const CreateEditExerciseDrawer = (
         </DrawerHeader>
 
         <ExerciseForm
-          selectedExerciseId={selectedExerciseId}
+          selectedExerciseId={selectedExercise?.id}
           register={register}
           control={control}
           setValue={setValue}
+          previewImage={previewImage}
+          setPreviewImage={setPreviewImage}
         />
 
         <DrawerFooter>
           <Button
             className="mt-2"
-            disabled={isPending}
-            onClick={selectedExerciseId ? handleEditExercise : handleCreateExercise}
+            disabled={isPending || updateMutation.isPending}
+            onClick={selectedExercise ? handleEditExercise : handleCreateExercise}
           >
-            {isPending
+            {(isPending || updateMutation.isPending)
               ? "Guardando..."
-              : selectedExerciseId ? "Guardar cambios" : "Crear ejercicio"}
+              : selectedExercise ? "Guardar cambios" : "Crear ejercicio"}
           </Button>
-          {selectedExerciseId && (
+          {selectedExercise && (
             <Button
               variant="destructive"
-              onClick={handleDeleteExercise}
+              onClick={()=>deleteMutation.mutate(selectedExercise.id)}
             >
               Eliminar ejercicio
             </Button>

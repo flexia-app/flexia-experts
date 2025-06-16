@@ -2,7 +2,7 @@ import api from '../api';
 import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
 import type {Difficulty} from "@/exercises/types/difficulty.ts";
 import type {Equipment} from "@/exercises/types/equipment.ts";
-import type {SearchExercisesResponse} from "@/exercises/types/exercise.ts";
+import type {CreateExercise, SearchExercisesResponse} from "@/exercises/types/exercise.ts";
 
 export const getAllExercises = async () => {
   const response = await api.get(`/exercises`);
@@ -44,11 +44,25 @@ export const filterExercisesByProps = async (
 };
 
 
-export const createExercise = async (exercise: FormData) => {
+export const createExercise = async (exercise: CreateExercise) => {
   const response = await api.post(`/exercises`, exercise, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+}
+
+export const updateExercise = async (exerciseId: string, exercise: Partial<CreateExercise>) => {
+  const response = await api.patch(`/exercises/${exerciseId}`, exercise, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  });
+  return response.data;
+};
+
+export const deleteExercise = async (exerciseId: string) => {
+  const response = await api.delete(`/exercises/${exerciseId}`);
   return response.data;
 }

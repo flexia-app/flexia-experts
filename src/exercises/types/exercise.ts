@@ -26,6 +26,7 @@ export interface CreateExercise {
   difficulty: Difficulty;
   equipments: Equipment[];
   muscleGroups: MuscleGroup[];
+  active: boolean;
 }
 
 export interface SearchExercisesResponse {

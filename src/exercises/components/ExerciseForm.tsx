@@ -10,34 +10,18 @@ import {
   LOG_TYPES
 } from "@/exercises/utils/filters.ts";
 import {FMultiSelectWithChips} from "@/components/FMultiSelectWithChips.tsx";
-import {useState} from "react";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {type Control, Controller, type UseFormRegister, type UseFormSetValue} from "react-hook-form";
-import type {LogType} from "@/exercises/types/log-type.ts";
-import type {Difficulty} from "@/exercises/types/difficulty.ts";
-import type {MuscleGroup} from "@/exercises/types/muscle-group.ts";
-import type {Equipment} from "@/exercises/types/equipment.ts";
-import type {ExerciseType} from "@/exercises/types/exercise-type.ts";
-
-export type ExerciseFormData = {
-  id?: string;
-  title: string;
-  description: string;
-  exerciseType: ExerciseType;
-  logType: LogType;
-  difficulty: Difficulty;
-  muscles: MuscleGroup[];
-  equipments: Equipment[];
-  image: File;
-  active: boolean;
-}
+import type {ExerciseFormData} from "@/exercises/utils/exerciseFormUtils.ts";
 
 interface ExerciseFormProps {
   selectedExerciseId?: string;
   register: UseFormRegister<ExerciseFormData>;
   control: Control<ExerciseFormData>;
   setValue: UseFormSetValue<ExerciseFormData>;
+  previewImage: string | null;
+  setPreviewImage: (image: string) => void;
 }
 
 export const ExerciseForm = (
@@ -46,18 +30,26 @@ export const ExerciseForm = (
     register,
     control,
     setValue,
+    previewImage,
+    setPreviewImage,
   }: ExerciseFormProps
 ) => {
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-
   return (
     <div className="grid gap-2 px-4 overflow-y-auto">
       {selectedExerciseId && (
-        <FSelect
-          label="Visualización"
-          options={AVAILABILITIES}
-          placeholder="Configura la visualización"
-          {...register("active", { required: true })}
+        <Controller
+          name="active"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FSelect
+              label="Configura la visualización"
+              options={AVAILABILITIES}
+              value={field.value}
+              onValueChange={field.onChange}
+              emptyLabel="Selecciona"
+            />
+          )}
         />
       )}
       <Input
@@ -151,7 +143,7 @@ export const ExerciseForm = (
               reader.readAsDataURL(file);
             }
             else {
-              setPreviewImage(null);
+              setPreviewImage("");
             }
           }}
         />

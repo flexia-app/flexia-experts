@@ -64,6 +64,6 @@ export const LOG_TYPES: { value: LogType; label: string }[] = [
 ]
 
 export const AVAILABILITIES = [
-  { value: true, label: "Activo" },
-  { value: false, label: "Inactivo" },
-]
+  { label: "Activo", value: "true" },
+  { label: "Inactivo", value: "false" },
+];

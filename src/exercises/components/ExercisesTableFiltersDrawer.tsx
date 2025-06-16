@@ -32,6 +32,7 @@ export const ExercisesTableFiltersDrawer = (
 
   function handleClearFilters() {
     dispatch(clearFilters());
+    setOpen(false);
   }
 
   return (

@@ -12,7 +12,7 @@ import { logout } from '@/store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {filterExercisesByProps, searchExercisesByName} from "@/api/exercises/exercisesApi.ts";
-import type {SearchExercisesResponse} from "@/exercises/types/exercise.ts";
+import type {Exercise, SearchExercisesResponse} from "@/exercises/types/exercise.ts";
 import type {RootState} from "@/store";
 import {clearFilters} from "@/store/filtersSlice.ts";
 
@@ -22,7 +22,7 @@ export const ExercisesPage = () => {
 
   const [openFilters, setOpenFilters] = useState(false);
   const [openFormDrawer, setOpenFormDrawer] = useState(false);
-  const [selectedExerciseId, setSelectedExerciseId] = useState<string>();
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -77,7 +77,7 @@ export const ExercisesPage = () => {
         </div>
 
         <div className="flex w-full justify-between mb-4">
-          <div className="flex w-1/3 gap-2">
+          <div className="flex w-1/2 gap-2">
             <Input
               placeholder="Buscar por nombre"
               value={search}
@@ -86,12 +86,17 @@ export const ExercisesPage = () => {
             <Button onClick={()=>setOpenFilters(!openFilters)}>
               Filtros
             </Button>
+            {(muscleGroup || difficulty || equipment) && (
+              <Button variant="destructive" onClick={()=>dispatch(clearFilters())}>
+                Limpiar Filtros
+              </Button>
+            )}
           </div>
           <Button
             className="hover:cursor-pointer"
             onClick={()=>{
+              setSelectedExercise(undefined);
               setOpenFormDrawer(true);
-              setSelectedExerciseId(undefined);
             }}
           >
             Nuevo Ejercicio
@@ -102,7 +107,7 @@ export const ExercisesPage = () => {
           exercises={data?.data ?? []}
           isLoading={isLoading}
           isError={isError}
-          setSelectedExerciseId={setSelectedExerciseId}
+          setSelectedExercise={setSelectedExercise}
           setOpenFormDrawer={setOpenFormDrawer}
           page={page}
           setPage={setPage}
@@ -117,7 +122,7 @@ export const ExercisesPage = () => {
       <CreateEditExerciseDrawer
         open={openFormDrawer}
         setOpen={setOpenFormDrawer}
-        selectedExerciseId={selectedExerciseId}
+        selectedExercise={selectedExercise}
       />
     </>
   )

@@ -10,7 +10,7 @@ import type {Equipment} from "@/exercises/types/equipment.ts";
 import {mapLabel} from "@/exercises/utils/mapLabel.ts";
 
 interface ExercisesTableProps {
-  setSelectedExerciseId: (exerciseId: string) => void;
+  setSelectedExercise: (exercise: Exercise) => void;
   setOpenFormDrawer: (open: boolean) => void;
   exercises: Exercise[];
   isLoading: boolean;
@@ -23,7 +23,7 @@ interface ExercisesTableProps {
 
 export const ExercisesTable = (
   {
-    setSelectedExerciseId,
+    setSelectedExercise,
     setOpenFormDrawer,
     exercises,
     isLoading,
@@ -67,7 +67,7 @@ export const ExercisesTable = (
       header: "Visualización",
       cell: ({ row }) => {
         const active = row.getValue("active");
-        return active ? "🟢 Activo" : "🟢 Inactivo";
+        return active ? "🟢 Activo" : "🔴 Inactivo";
       },
     },
     {
@@ -77,7 +77,7 @@ export const ExercisesTable = (
           <Button
             onClick={() => {
               if (row.original.id) {
-                setSelectedExerciseId(row.original.id);
+                setSelectedExercise(row.original);
                 setOpenFormDrawer(true);
               } else {
                 toast.error("Error recuperando el ejercicio");
@@ -96,17 +96,17 @@ export const ExercisesTable = (
       {isLoading ? (
         <div className="w-full h-full">
           <div className="flex flex-col space-y-4 animate-pulse">
-            <div className="grid grid-cols-5 gap-4">
-              {[...Array(5)].map((_, i) => (
+            <div className="grid grid-cols-7 gap-4">
+              {[...Array(7)].map((_, i) => (
                 <div key={`header-${i}`} className="h-8 bg-gray-200 rounded" />
               ))}
             </div>
-            {[...Array(5)].map((_, rowIdx) => (
+            {[...Array(7)].map((_, rowIdx) => (
               <div
                 key={`row-${rowIdx}`}
-                className="grid grid-cols-5 gap-4"
+                className="grid grid-cols-7 gap-4"
               >
-                {[...Array(5)].map((_, colIdx) => (
+                {[...Array(7)].map((_, colIdx) => (
                   <div key={colIdx} className="h-8 bg-gray-100 rounded" />
                 ))}
               </div>
