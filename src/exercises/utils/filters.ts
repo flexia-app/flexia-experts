@@ -35,7 +35,7 @@ export const EQUIPMENTS: { value: Equipment; label: string }[] = [
   { value: "Cable Machine", label: "Máquina de Poleas" },
   { value: "Weight Plate", label: "Disco de Peso" },
   { value: "EZ Curl Bar", label: "Barra Z" },
-  { value: "Foam Roll", label: "Rulo de Espuma" },
+  { value: "Foam Roll", label: "Foam Roll" },
   { value: "Exercise Ball", label: "Pelota de Ejercicio" },
   { value: "Bands", label: "Bandas" },
   { value: "Jumping Rope", label: "Cuerda de salto" },
