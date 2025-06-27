@@ -38,8 +38,13 @@ export const ExercisesTable = (
   const getDifficultyLabel = mapLabel(DIFFICULTIES);
   const getEquipmentLabel = mapLabel(EQUIPMENTS);
 
+  const difficultyStars: Record<string, number> = {
+    Beginner: 1,
+    Intermediate: 2,
+    Advanced: 3,
+  };
+
   const columns: ColumnDef<Exercise>[] = [
-    { accessorKey: "id", header: "Id" },
     { accessorKey: "name", header: "Nombre" },
     {
       accessorKey: "muscleGroups",
@@ -60,7 +65,13 @@ export const ExercisesTable = (
     {
       accessorKey: "difficulty",
       header: "Dificultad",
-      cell: ({ row }) => getDifficultyLabel(row.getValue("difficulty")),
+      cell: ({ row }) => {
+        const value = row.getValue("difficulty");
+        const label = getDifficultyLabel(String(value));
+        const starsCount = difficultyStars[String(value)] || 0;
+        const stars = "⭐".repeat(starsCount);
+        return `${stars} ${label}`;
+      },
     },
     {
       accessorKey: "active",
@@ -68,6 +79,22 @@ export const ExercisesTable = (
       cell: ({ row }) => {
         const active = row.getValue("active");
         return active ? "🟢 Activo" : "🔴 Inactivo";
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Fecha de creación",
+      cell: ({ row }) => {
+        const value = row.getValue("createdAt");
+        if (!value) return "";
+        const date = new Date(String(value));
+        return date.toLocaleString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
       },
     },
     {

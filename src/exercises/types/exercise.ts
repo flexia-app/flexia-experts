@@ -15,6 +15,7 @@ export interface Exercise {
   muscleGroups: MuscleGroup[];
   mediaUrl: string;
   active: boolean;
+  createdAt: Date;
 }
 
 export interface CreateExercise {
